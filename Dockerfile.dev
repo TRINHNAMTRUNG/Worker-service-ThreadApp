@@ -1,0 +1,27 @@
+FROM node:18-alpine
+
+# Cài thêm các công cụ build
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Sao chép package.json và package-lock.json để tận dụng cache
+COPY package*.json ./
+
+# Cài cả devDependencies (cần cho ts-node và nodemon)
+RUN npm install
+
+# Sao chép mã nguồn (chỉ src và các file cần thiết)
+COPY tsconfig.json ./
+COPY src/ ./src/
+COPY nodemon.json ./
+
+# Đảm bảo port được expose
+EXPOSE 8091
+
+# Cấu hình polling cho nodemon
+ENV CHOKIDAR_USEPOLLING=true
+ENV CHOKIDAR_INTERVAL=1000
+
+# Chạy với npx nodemon, sử dụng ts-node thay vì ts-node-esm
+CMD ["npm", "start"]
