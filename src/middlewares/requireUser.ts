@@ -17,7 +17,8 @@ export const requireUser = (req: Request, res: Response, next: NextFunction) => 
       throw AppError.logic("User information is required", 401, httpStatusCode["401_NAME"]);
     }
 
-    const user = JSON.parse(rawUser);
+    // Decode base64 và parse JSON
+    const user = JSON.parse(Buffer.from(rawUser, 'base64').toString());
     req.user = user;
 
     next();
